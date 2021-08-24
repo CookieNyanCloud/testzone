@@ -1,6 +1,6 @@
 //+build integration
 
-package main_test
+package testdata_test
 
 import "testing"
 

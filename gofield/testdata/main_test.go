@@ -1,6 +1,6 @@
 //+build unit
 
-package main
+package testdata
 
 import (
 	"io"
