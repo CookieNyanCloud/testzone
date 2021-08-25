@@ -2,32 +2,45 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/testzone/gofield/serverGin/entity"
 	"github.com/testzone/gofield/serverGin/service"
+	"github.com/testzone/gofield/serverGin/validators"
 )
 
 type VideoController interface {
 	FindAll() []entity.Video
-	Save(ctx *gin.Context) entity.Video
+	Save(ctx *gin.Context) error
 }
 
 type controller struct {
 	service service.VideoService
 }
+var validate *validator.Validate
 
 func New(service service.VideoService) VideoController  {
+	validate = validator.New()
+	_=validate.RegisterValidation("is-cool",validators.ValidateCoolTitle)
 	return &controller{
 		service,
 	}
 }
 
+
 func (c *controller) FindAll() []entity.Video  {
 	return c.service.FindAll()
 }
 
-func (c *controller) Save(ctx *gin.Context) entity.Video  {
+func (c *controller) Save(ctx *gin.Context) error  {
 	var video entity.Video
-	_=ctx.BindJSON(&video)
+	err:=ctx.ShouldBindJSON(&video)
+	if err!=nil{
+		return err
+	}
+	err = validate.Struct(video)
+	if err!=nil{
+		return err
+	}
 	c.service.Save(video)
-	return video
+	return nil
 }
