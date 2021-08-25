@@ -3,7 +3,11 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/testzone/gofield/serverGin/controller"
+	"github.com/testzone/gofield/serverGin/middlewares"
 	"github.com/testzone/gofield/serverGin/service"
+	gindump "github.com/tpkeeper/gin-dump"
+	"io"
+	"os"
 )
 
 var(
@@ -11,8 +15,21 @@ var(
 	videoController controller.VideoController = controller.New(videoService)
 )
 
+func setupOutput()  {
+	f,_:=os.Create("/serverGin/gin.log")
+	gin.DefaultWriter =io.MultiWriter(f,os.Stdout)
+}
+
 func main()  {
-	server:= gin.Default()
+	setupOutput()
+
+	server:= gin.New()
+
+	server.Use(gin.Recovery(),
+		middlewares.Logger(),
+		middlewares.BasicAuth(),
+		gindump.Dump(),
+	)
 
 	server.GET("/test", func(ctx *gin.Context) {
 		ctx.JSON(200,gin.H{
