@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/testzone/gofield/serverGin/controller"
 	"github.com/testzone/gofield/serverGin/middlewares"
@@ -68,5 +69,9 @@ func main()  {
 	if port == ""{
 		port = "8080"
 	}
-	_=server.Run(":"+port)
+	err:=server.Run(":"+port)
+	if err== nil {
+		fmt.Println("Listening on ", port)
+	}
+
 }
